@@ -4,9 +4,9 @@ $ONELOGIN_BASE64_STRING = [System.Convert]::ToBase64String([System.Text.Encoding
 $ONELOGIN_HEADERS = @{Authorization = "Basic $ONELOGIN_BASE64_STRING"}
 
 $ONELOGIN_END_POINTS = @{
-	"Users"		= "https://api.onelogin.com/api/v3/users.xml"
-	"ByUserName"= "https://api.onelogin.com/api/v3/users/username/"
-	"ByID"		= "https://api.onelogin.com/api/v3/users/"
+	"Users"	= "https://api.onelogin.com/api/v3/users.xml"
+	"ByUserName" = "https://api.onelogin.com/api/v3/users/username/"
+	"ByID" = "https://api.onelogin.com/api/v3/users/"
 }
 
 function Get-OneLoginUser {
@@ -19,25 +19,25 @@ function Get-OneLoginUser {
 		foreach ($N in $Nodes) {
 			$UserObj = New-Object PSObject
 			foreach ($Key in $N.ChildNodes) {
-				$KeyName	= $Key.Name
-               	$TextInfo 	= (Get-Culture).TextInfo
-               	$PSKeyName	= $TextInfo.ToTitleCase($KeyName.Replace("-"," ")).Replace(" ","")
-               	$KeyVal		= $N.$KeyName
+				$KeyName = $Key.Name
+               			$TextInfo = (Get-Culture).TextInfo
+               			$PSKeyName = $TextInfo.ToTitleCase($KeyName.Replace("-"," ")).Replace(" ","")
+               			$KeyVal = $N.$KeyName
 				if ($KeyVal.nil) {
 					$UserObj | Add-Member -MemberType NoteProperty -Name $PSKeyName -Value $null
 				}
 				else {
-                   	if ($KeyName -eq "status") {
-                       	switch ($KeyVal) {
-                           	0 {$KeyVal = "Unactivated"}
+                   			if ($KeyName -eq "status") {
+                       				switch ($KeyVal) {
+                           				0 {$KeyVal = "Unactivated"}
 							1 {$KeyVal = "Active"}
-                    	    2 {$KeyVal = "Suspended"}
-                	        3 {$KeyVal = "Locked"}
-            	            4 {$KeyVal = "Password Expired"}
-        	                5 {$KeyVal = "Awaiting Password Reset"}
-    	                    default {$KeyVal = "Unknown"}
-	                    }
-                   	}
+                    	    				2 {$KeyVal = "Suspended"}
+                	        			3 {$KeyVal = "Locked"}
+            	            				4 {$KeyVal = "Password Expired"}
+        	                			5 {$KeyVal = "Awaiting Password Reset"}
+    	                    				default {$KeyVal = "Unknown"}
+	                			}
+                   			}
 					$UserObj | Add-Member -MemberType NoteProperty -Name $PSKeyName -Value $KeyVal
 				}
 			}
@@ -54,8 +54,8 @@ function Get-OneLoginUser {
 			$Data = $true
 			$i = 1
 			while ($Data) {
-				[xml]$XML	= (curl -Uri $($ONELOGIN_END_POINTS["Users"] + "?page=$i") -Header $ONELOGIN_HEADERS -Method "GET").Content
-				$TempArr	= Create-OneLoginObjects -XML $XML -XPath "/users/user"
+				[xml]$XML = (curl -Uri $($ONELOGIN_END_POINTS["Users"] + "?page=$i") -Header $ONELOGIN_HEADERS -Method "GET").Content
+				$TempArr = Create-OneLoginObjects -XML $XML -XPath "/users/user"
 				if ($TempArr) {
 					[array]$AllUsers += $TempArr
 					$i++
@@ -87,11 +87,11 @@ function Remove-OneLoginUser {
 	param ([string]$Username, [string]$UserID)
 	if ($Username) {
 		$FullURI = $ONELOGIN_END_POINTS["ByUsername"] + $Username
-        Write-Host "Removing ${Username}: " -NoNewline
+        	Write-Host "Removing ${Username}: " -NoNewline
 	}
 	elseif ($ID) {
 		$FullURI = $ONELOGIN_END_POINTS["ByID"] + $UserID
-        Write-Host "Removing ${UserID}: " -NoNewline
+        	Write-Host "Removing ${UserID}: " -NoNewline
 	}
 	try {
 		$WebReq = curl -Uri $FullURI -Header $ONELOGIN_HEADERS -Method "DELETE"
