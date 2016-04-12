@@ -1,4 +1,4 @@
-﻿$ONELOGIN_API_KEY = ""	# Key here...
+$ONELOGIN_API_KEY = ""	# Key here...
 $ONELOGIN_USER = $ONELOGIN_API_KEY + ":X"
 $ONELOGIN_BASE64_STRING = [System.Convert]::ToBase64String([System.Text.Encoding]::ASCII.GetBytes($ONELOGIN_USER))
 $ONELOGIN_HEADERS = @{Authorization = "Basic $ONELOGIN_BASE64_STRING"}
@@ -19,10 +19,10 @@ function Get-OneLoginUser {
 		foreach ($N in $Nodes) {
 			$UserObj = New-Object PSObject
 			foreach ($Key in $N.ChildNodes) {
-				$KeyName = $Key.Name
-               	$TextInfo = (Get-Culture).TextInfo
-               	$PSKeyName = $TextInfo.ToTitleCase($KeyName.Replace("-"," ")).Replace(" ","")
-               	$KeyVal = $N.$KeyName
+				$KeyName	= $Key.Name
+               	$TextInfo 	= (Get-Culture).TextInfo
+               	$PSKeyName	= $TextInfo.ToTitleCase($KeyName.Replace("-"," ")).Replace(" ","")
+               	$KeyVal		= $N.$KeyName
 				if ($KeyVal.nil) {
 					$UserObj | Add-Member -MemberType NoteProperty -Name $PSKeyName -Value $null
 				}
@@ -54,8 +54,8 @@ function Get-OneLoginUser {
 			$Data = $true
 			$i = 1
 			while ($Data) {
-				[xml]$XML = (curl -Uri $($ONELOGIN_END_POINTS["Users"] + "?page=$i") -Header $ONELOGIN_HEADERS -Method "GET").Content
-				$TempArr = Create-OneLoginObjects -XML $XML -XPath "/users/user"
+				[xml]$XML	= (curl -Uri $($ONELOGIN_END_POINTS["Users"] + "?page=$i") -Header $ONELOGIN_HEADERS -Method "GET").Content
+				$TempArr	= Create-OneLoginObjects -XML $XML -XPath "/users/user"
 				if ($TempArr) {
 					[array]$AllUsers += $TempArr
 					$i++
